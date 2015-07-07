@@ -1,14 +1,11 @@
 %% Basic Parameters
 % set these parameters carefully.
 
+TestName        =   '15070606';
+PatientName     =   'Jubinville';
+
 winWidth        =   650;
 winHeight       =   700;
-PPD_X           =   20;             % Pixels per degree
-PPD_Y           =   20;
-FixationTimeMin =   1000;
-FixationTimeMax =   1500;
-TestName        =   '15070608';
-PatientName     =   'Jubinville';
 
 %% ASCII File Information
 filename = ['D:\Data\Eye Tracking\Patients\',PatientName,'\Eye Data\' TestName '.asc'];
@@ -16,6 +13,15 @@ SaveLocation = ['D:\Data\Eye Tracking\Patients\',PatientName,'\Eye Data\EyePrePr
 delimiter = '\t';
 formatSpec = '%s%s%s%*s%*s%*s%*s%*s%*s%[^\n\r]';
 
+%% Stimulus Object 
+
+StimulusObjectDir = ['D:\Data\Eye Tracking\Patients\',PatientName,'\Stimulus Object\'];
+StimulusObject = load([StimulusObjectDir '\' TestName]);
+
+PPD_X = StimulusObject.S.PPD_X;
+PPD_Y = StimulusObject.S.PPD_Y;
+FixationTimeMax = StimulusObject.S.FixationTimeMax;
+FixationTimeMin = StimulusObject.S.FixationTimeMin;
 
 %% Read ASCII
 fprintf('######################################################################################## \n')
@@ -95,8 +101,7 @@ end
 
 %% Cut to conditions
 fprintf(['Cut to Conditions ... '])
-StimulusObjectDir = ['D:\Data\Eye Tracking\Patients\',PatientName,'\Stimulus Object\'];
-StimulusObject = load([StimulusObjectDir '\' TestName]);
+
 StimulusOrder = StimulusObject.S.order;
 NumConditions = length(StimulusObject.S.type);
 NumTrials = floor(max(StimulusObject.S.order)./NumConditions);
