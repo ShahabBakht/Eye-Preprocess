@@ -1,7 +1,7 @@
 %% Set the Experiment Information Here
 
-TestName        =   '15070604';
-PatientName     =   'Jubinville';
+TestName        =   'TestSRPursuit';
+PatientName     =   'Test';
 
 %% What do you want to do?
 ToDo = struct(...

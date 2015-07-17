@@ -35,8 +35,14 @@ classdef Eye < handle
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             PPD_X = I.StimulusObject.S.PPD_X;
             PPD_Y = I.StimulusObject.S.PPD_Y;
-            FixationTimeMax = I.StimulusObject.S.FixationTimeMax;
-            FixationTimeMin = I.StimulusObject.S.FixationTimeMin;
+            
+            if strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit')
+                FixationTimeMax = I.StimulusObject.S.FixationTimeMax_noDots + I.StimulusObject.S.FixationTimeMax_withDots;
+                FixationTimeMin = I.StimulusObject.S.FixationTimeMin_noDots + I.StimulusObject.S.FixationTimeMin_withDots;
+            else
+                FixationTimeMax = I.StimulusObject.S.FixationTimeMax;
+                FixationTimeMin = I.StimulusObject.S.FixationTimeMin;
+            end
             SaveLocation = I.PreProcessFile;
             
             % Read ASCII
@@ -121,7 +127,7 @@ classdef Eye < handle
             
             % cutting to conditions is different for different types of
             % stimuli
-            if strcmp(I.StimulusObject.S.Type,'StepRamp') 
+            if strcmp(I.StimulusObject.S.Type,'StepRamp') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit')
                 StimulusOrder = I.StimulusObject.S.order;
                 NumConditions = length(I.StimulusObject.S.type);
                 NumTrials = floor(max(I.StimulusObject.S.order)./NumConditions);
@@ -220,7 +226,7 @@ classdef Eye < handle
             
             % Different variables will be saved to EyePreProcessed in the
             % case of different stimuli.
-            if strcmp(I.StimulusObject.S.Type,'StepRamp')
+            if strcmp(I.StimulusObject.S.Type,'StepRamp') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit')
                 fprintf(['Save to File ... '])
                 EyePreProcessed.X = Xtc;EyePreProcessed.Y = Ytc;
                 EyePreProcessed.Xtrunc = XtcTrunc;EyePreProcessed.Ytrunc = YtcTrunc;
