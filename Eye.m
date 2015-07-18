@@ -1,3 +1,7 @@
+% to do:
+% 1- Complete the ComputeEyeVelocity function
+% 2- Complete DesaccadeEye function
+
 classdef Eye < handle
     
     properties
@@ -372,6 +376,22 @@ classdef Eye < handle
             end
             
         end
+        
+        function ComputeEyeVelocity(I)
+            
+            Type = I.StimulusObject.S.Type;
+            SampleRate = 0.001;
+        if I.LoadEyeFlag
+            
+            
+        end
+        
+        end
+        
+        function DesaccadeEye(I)
+            
+        end
+        
     end
     
 

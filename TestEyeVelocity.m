@@ -1,13 +1,29 @@
-fmax_detect = 25;
+
+x = squeeze(X(1,7,:));
+f1 = 50;
 sr = 1000;
-x = squeeze(X(1,2,:));
-xr = resample(x,1,2);
-[b,a]=ellip(2,0.1,40,fmax_detect*2/sr/2,'low');
-% [b,a]=butter(10,fmax_detect*2/sr,'low');
-% [b,a] = besself(4,fmax_detect*2/(sr/2));
-xf=filtfilt(b,a,xr);
-v = gradient(xf,0.002);
-plot(v)
-plot(0:1/(sr/2):(length(v)-1)/(sr/2),v);
-hold on;
-plot(0:1/(sr/2):(length(v)-1)/(sr/2),xf)
+[b,a]=ellip(5,0.1,40,f1*2/(sr),'low');
+xf=filtfilt(b,a,x);
+
+q = 5;
+xdata = iddata(xf,[],0.001);
+xdataR = resample(xdata,1,q,5);
+x = xdataR.OutputData;
+fmax_detect = 10;
+sr = 1000/q;
+
+[b,a]=ellip(5,0.1,40,fmax_detect*2/(sr),'low');
+
+xf=filtfilt(b,a,x);
+% xr = decimate(x,10,'fir');
+% xr = resample(xr,2,1);
+% [b,a]=butter(1,fmax_detect*2/sr,'low');
+% [b,a] = ellip(8,5,40,fmax_detect*2/sr,'low');
+% freqz(b,a)
+% [b,a] = besself(20,fmax_detect*2/(sr/1));
+
+v = gradient(xf,1/sr);
+vf=filtfilt(b,a,v);
+
+
+
