@@ -11,6 +11,7 @@ classdef Eye < handle
         PreProcessFile  % address to the location of the preprocessed file
         PreProcessedEye
        	LoadEyeFlag     % true if you want to load the PreProcessedEye
+        ComputeVelocityFlag
         StimulusObject
         
     end
@@ -150,7 +151,10 @@ classdef Eye < handle
                     end
                     
                 end
+                Lx(Lx == 0) = nan;
+                Ly(Ly == 0) = nan;
                 MinL = min(min([Lx,Ly]));
+                              
                 XtcTrunc = nan(NumConditions,NumTrials,MinL);
                 YtcTrunc = nan(NumConditions,NumTrials,MinL);
                 for condcount = 1:NumConditions
@@ -377,13 +381,53 @@ classdef Eye < handle
             
         end
         
-        function ComputeEyeVelocity(I)
+        function ComputeEyeVelocity(I) % only X velocity is being calculated
             
             Type = I.StimulusObject.S.Type;
             SampleRate = 0.001;
+            NumTrials = I.StimulusObject.S.NumTrials;
+            NumConditions = I.StimulusObject.S.NumConditions;
+            EyeFile = matfile([I.PreProcessFile,'EyePreProcessed_',I.TestName,'.mat']); 
+            EyeFile.Properties.Writable = true;
         if I.LoadEyeFlag
-            
-            
+            X = I.PreProcessedEye.EyePreProcessed.Xtrunc;
+            V = nan(size(X));
+            for condcount = 1:NumConditions
+                for trcount = 1:NumTrials
+                    x = squeeze(X(condcount,trcount,:));
+                    x(isnan(x)) = 0;
+                    T = 0:SampleRate:(length(x)-1)*SampleRate;
+                    fitobject = fit(T',x,'smoothingspline','SmoothingParam',.995);
+                    xfit = feval(fitobject,T);
+%                     figure;plot(T,xfit,'r');hold on;plot(T,x,'k');pause;close;
+                    v = gradient(xfit,SampleRate);
+%                     figure;plot(T,v,'k');pause;close;
+                    V(condcount,trcount,:) = v;
+                end
+            end
+            EyePreProcessed.Vxtrunc = V;
+            EyeFile.EyePreProcessed = EyePreProcessed;
+            clear V X;
+        else
+            EyePreProcessed = EyeFile.EyePreProcessed;
+            X = EyePreProcessed.Xtrunc;
+            V = nan(size(X));
+            for condcount = 1:NumConditions
+                for trcount = 1:NumTrials
+                    x = squeeze(X(condcount,trcount,:));
+                    x(isnan(x)) = 0;
+                    T = 0:SampleRate:(length(x)-1)*SampleRate;
+                    fitobject = fit(T',x,'smoothingspline','SmoothingParam',.995);
+                    xfit = feval(fitobject,T);
+%                     figure;plot(T,xfit,'r');hold on;plot(T,x,'k');pause;close
+                    v = gradient(xfit,SampleRate);
+%                     figure;plot(T,v,'k');pause;close;
+                    V(condcount,trcount,:) = v;
+                end
+            end
+            EyePreProcessed.Vxtrunc = V;
+            EyeFile.EyePreProcessed = EyePreProcessed;
+            clear V X EyePreProcessed;
         end
         
         end
