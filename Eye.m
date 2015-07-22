@@ -35,8 +35,8 @@ classdef Eye < handle
             formatSpec = '%s%s%s%*s%*s%*s%*s%*s%*s%[^\n\r]';
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % change these two if otherwise
-            winWidth        =   650;
-            winHeight       =   700;
+            winWidth        =   1024;
+            winHeight       =   1280;
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             PPD_X = I.StimulusObject.S.PPD_X;
             PPD_Y = I.StimulusObject.S.PPD_Y;
