@@ -13,6 +13,7 @@ classdef Eye < handle
        	LoadEyeFlag     % true if you want to load the PreProcessedEye
         ComputeVelocityFlag
         StimulusObject
+        velocity_method
         
     end
     
@@ -35,8 +36,8 @@ classdef Eye < handle
             formatSpec = '%s%s%s%*s%*s%*s%*s%*s%*s%[^\n\r]';
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % change these two if otherwise
-            winWidth        =   1024;
-            winHeight       =   1280;
+            winWidth        =   512;
+            winHeight       =   640;
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             PPD_X = I.StimulusObject.S.PPD_X;
             PPD_Y = I.StimulusObject.S.PPD_Y;
@@ -278,7 +279,7 @@ classdef Eye < handle
             SampleRate = 0.001;
             
             if I.LoadEyeFlag
-                switch Type
+                switch Type{1}
                     case 'StepRamp'
                         X = I.PreProcessedEye.EyePreProcessed.Xtrunc;
                         Y = I.PreProcessedEye.EyePreProcessed.Ytrunc;
@@ -321,6 +322,25 @@ classdef Eye < handle
                         
                         figure;title('testLearn condition');subplot(2,1,1);plot(T_testLearn,X_testLearn,'b');ylabel('X(degree)');xlabel('Time')
                         subplot(2,1,2);plot(T_testLearn,Y_testLearn,'b');ylabel('Y(degree)');xlabel('Time')
+                        
+                    case 'RandomDotsPursuit'
+                        X = I.PreProcessedEye.EyePreProcessed.Xtrunc;
+                        Y = I.PreProcessedEye.EyePreProcessed.Ytrunc;
+                        NumTimeSamples = length(X);
+                        T = 0:SampleRate:(NumTimeSamples - 1)*SampleRate;
+                        NumConditions = I.StimulusObject.S.NumConditions;
+                        NumTrials = I.StimulusObject.S.NumTrials;
+                        for cond = 1:NumConditions
+                            
+                            figure;
+                            subplot(2,1,1);plot(T,squeeze(X(cond,:,:))','Color',[0.5,0.5,0.5]);ylabel('X (degree)');xlabel('time')
+                            hold on;
+                            subplot(2,1,1);plot(T,squeeze(nanmean(X(cond,:,:),2)),'Color',[1,0,0]);
+                            subplot(2,1,2);plot(T,squeeze(Y(cond,:,:))','Color',[0.5,0.5,0.5]);ylabel('Y (degree)');xlabel('time')
+                            hold on;
+                            subplot(2,1,2);plot(T,squeeze(nanmean(Y(cond,:,:),2)),'Color',[1,0,0]);
+                            
+                        end
                         
                         
                 end
@@ -376,6 +396,28 @@ classdef Eye < handle
                         subplot(2,1,2);plot(T_testLearn,Y_testLearn,'b');ylabel('Y(degree)');xlabel('Time')
                         
                         clear EyePreProcessed
+                    case 'RandomDotsPursuit'
+                        SaveLocation = I.PreProcessFile;
+                        load([SaveLocation, 'EyePreProcessed_',I.TestName, '.mat']);
+                        X = EyePreProcessed.Xtrunc;
+                        Y = EyePreProcessed.Ytrunc;
+                        NumTimeSamples = length(X);
+                        T = 0:SampleRate:(NumTimeSamples - 1)*SampleRate;
+                        NumConditions = I.StimulusObject.S.NumConditions;
+                        NumTrials = I.StimulusObject.S.NumTrials;
+                        for cond = 1:NumConditions
+                            
+                            figure;
+                            subplot(2,1,1);plot(T,squeeze(X(cond,:,:))','Color',[0.5,0.5,0.5]);ylabel('X (degree)');xlabel('time')
+                            hold on;
+                            subplot(2,1,1);plot(T,squeeze(nanmean(X(cond,:,:),2)),'Color',[1,0,0]);
+                            subplot(2,1,2);plot(T,squeeze(Y(cond,:,:))','Color',[0.5,0.5,0.5]);ylabel('Y (degree)');xlabel('time')
+                            hold on;
+                            subplot(2,1,2);plot(T,squeeze(nanmean(Y(cond,:,:),2)),'Color',[1,0,0]);
+                            
+                        end
+                        clear EyePreProcessed
+                        
                 end
             end
             
@@ -383,7 +425,11 @@ classdef Eye < handle
         
         function ComputeEyeVelocity(I) % only X velocity is being calculated
             
+            
+            fprintf(['Computing Velocity ' I.TestName ' ... \n'])
+            
             Type = I.StimulusObject.S.Type;
+            VM = I.velocity_method;
             SampleRate = 0.001;
             NumTrials = I.StimulusObject.S.NumTrials;
             NumConditions = I.StimulusObject.S.NumConditions;
@@ -397,12 +443,17 @@ classdef Eye < handle
                     x = squeeze(X(condcount,trcount,:));
                     x(isnan(x)) = 0;
                     T = 0:SampleRate:(length(x)-1)*SampleRate;
-                    fitobject = fit(T',x,'smoothingspline','SmoothingParam',.995);
-                    xfit = feval(fitobject,T);
-%                     figure;plot(T,xfit,'r');hold on;plot(T,x,'k');pause;close;
-                    v = gradient(xfit,SampleRate);
-%                     figure;plot(T,v,'k');pause;close;
-                    V(condcount,trcount,:) = v;
+                    if strcmp(VM,'splines')
+                        fitobject = fit(T',x,'smoothingspline','SmoothingParam',.995);
+                        xfit = feval(fitobject,T);
+                        % figure;plot(T,xfit,'r');hold on;plot(T,x,'k');pause;close;
+                    elseif strcmp(VM,'lp')
+                        [b,a] = butter(6,25*2*SampleRate);
+                        xfit = filtfilt(b,a,x);
+                    end
+                        v = gradient(xfit,SampleRate);
+                        % figure;plot(T,v,'k');pause;close;
+                        V(condcount,trcount,:) = v;
                 end
             end
             EyePreProcessed.Vxtrunc = V;
@@ -429,7 +480,7 @@ classdef Eye < handle
             EyeFile.EyePreProcessed = EyePreProcessed;
             clear V X EyePreProcessed;
         end
-        
+        fprintf('######################################################################################## \n')
         end
         
         function DesaccadeEye(I)

@@ -1,6 +1,6 @@
 %% Set the Experiment Information Here
 
-TestName        =   '15072204';
+% TestName        =   'TestSRPursuit_2';
 PatientName     =   'Test';
 
 %% What do you want to do?                                                                                                                                                                                                                   
@@ -11,6 +11,9 @@ ToDo = struct(...
     'velocity', 0 ...       % for computing the velocity from the eye traces
     );
 
+VelocityMethod = 'lp';      % for Low-pass filtering method use 'lp'
+                            % for splines fitting method use 'splines'
+                            
 %%
 I = Eye(TestName,PatientName);
 
@@ -19,6 +22,7 @@ if ToDo.preprocess
 end
 
 if ToDo.velocity
+    I.velocity_method = VelocityMethod;
     I.ComputeEyeVelocity;
 end
 
