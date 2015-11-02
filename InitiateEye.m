@@ -1,11 +1,11 @@
 %% Set the Experiment Information Here
 
-% TestName        =   'TestSRPursuit_2';
+TestName        =   '15110203';
 PatientName     =   'Test';
 
 %% What do you want to do?                                                                                                                                                                                                                   
 ToDo = struct(...
-    'preprocess', 0, ...    % for converting, cutting, and triggering the eye traces
+    'preprocess', 1, ...    % for converting, cutting, and triggering the eye traces
     'load', 1, ...          % for loading the preprocessed data   
     'show', 0, ...          % for displaying the eye traces 
     'velocity', 0 ...       % for computing the velocity from the eye traces
@@ -21,15 +21,17 @@ if ToDo.preprocess
     I.DoEyePreProcess;
 end
 
+if ToDo.load
+    I.LoadEyeFlag = true;
+    I.LoadPreProcessedEye;
+end
+
 if ToDo.velocity
     I.velocity_method = VelocityMethod;
     I.ComputeEyeVelocity;
 end
 
-if ToDo.load
-    I.LoadEyeFlag = true;
-    I.LoadPreProcessedEye;
-end
+
 
 if ToDo.show
     I.ShowEye;

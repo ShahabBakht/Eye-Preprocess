@@ -42,7 +42,7 @@ classdef Eye < handle
             PPD_X = I.StimulusObject.S.PPD_X;
             PPD_Y = I.StimulusObject.S.PPD_Y;
             
-            if strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit')
+            if strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit2')
                 FixationTimeMax = I.StimulusObject.S.FixationTimeMax_noDots + I.StimulusObject.S.FixationTimeMax_withDots;
                 FixationTimeMin = I.StimulusObject.S.FixationTimeMin_noDots + I.StimulusObject.S.FixationTimeMin_withDots;
             else
@@ -133,7 +133,7 @@ classdef Eye < handle
             
             % cutting to conditions is different for different types of
             % stimuli
-            if strcmp(I.StimulusObject.S.Type,'StepRamp') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit')
+            if strcmp(I.StimulusObject.S.Type,'StepRamp') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit2')
                 StimulusOrder = I.StimulusObject.S.order;
                 NumConditions = length(I.StimulusObject.S.type);
                 NumTrials = floor(max(I.StimulusObject.S.order)./NumConditions);
@@ -235,7 +235,7 @@ classdef Eye < handle
             
             % Different variables will be saved to EyePreProcessed in the
             % case of different stimuli.
-            if strcmp(I.StimulusObject.S.Type,'StepRamp') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit')
+            if strcmp(I.StimulusObject.S.Type,'StepRamp') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit')|| strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit2')
                 fprintf(['Save to File ... '])
                 EyePreProcessed.X = Xtc;EyePreProcessed.Y = Ytc;
                 EyePreProcessed.Xtrunc = XtcTrunc;EyePreProcessed.Ytrunc = YtcTrunc;
@@ -436,7 +436,8 @@ classdef Eye < handle
             EyeFile = matfile([I.PreProcessFile,'EyePreProcessed_',I.TestName,'.mat']); 
             EyeFile.Properties.Writable = true;
         if I.LoadEyeFlag
-            X = I.PreProcessedEye.EyePreProcessed.Xtrunc;
+            EyePreProcessed = EyeFile.EyePreProcessed;
+            X = EyePreProcessed.Xtrunc;
             V = nan(size(X));
             for condcount = 1:NumConditions
                 for trcount = 1:NumTrials
@@ -448,8 +449,9 @@ classdef Eye < handle
                         xfit = feval(fitobject,T);
                         % figure;plot(T,xfit,'r');hold on;plot(T,x,'k');pause;close;
                     elseif strcmp(VM,'lp')
-                        [b,a] = butter(6,25*2*SampleRate);
+                        [b,a] = butter(6,20*2*SampleRate);
                         xfit = filtfilt(b,a,x);
+                        
                     end
                         v = gradient(xfit,SampleRate);
                         % figure;plot(T,v,'k');pause;close;
