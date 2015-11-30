@@ -8,10 +8,11 @@ X = I.PreProcessedEye.EyePreProcessed.Xtrunc;
 
 NumConditions = size(X,1);
 NumTrials = size(X,2);
+S = nan(NumConditions,NumTrials,3);
 
 for c = 1:NumConditions
     for tr = 1:NumTrials
-        x = squeeze(X(c,tr,1600:2000));
+        x = squeeze(X(c,tr,:));
         plot(x,'r');hold on
         title('set the beginning of the saccade:')
         [t_init,x_init] = ginput(1);

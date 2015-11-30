@@ -36,8 +36,8 @@ classdef Eye < handle
             formatSpec = '%s%s%s%*s%*s%*s%*s%*s%*s%[^\n\r]';
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % change these two if otherwise
-            winWidth        =   512;
-            winHeight       =   640;
+            winWidth        =   640;
+            winHeight       =   512;
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             PPD_X = I.StimulusObject.S.PPD_X;
             PPD_Y = I.StimulusObject.S.PPD_Y;
@@ -454,13 +454,13 @@ classdef Eye < handle
                         
                     end
                         v = gradient(xfit,SampleRate);
-                        % figure;plot(T,v,'k');pause;close;
+%                         figure;plot(T,v,'k');pause;close;
                         V(condcount,trcount,:) = v;
                 end
             end
             EyePreProcessed.Vxtrunc = V;
             EyeFile.EyePreProcessed = EyePreProcessed;
-            clear V X;
+%             clear V X;
         else
             EyePreProcessed = EyeFile.EyePreProcessed;
             X = EyePreProcessed.Xtrunc;
