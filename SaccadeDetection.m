@@ -14,10 +14,10 @@ for c = 1:NumConditions
     for tr = 1:NumTrials
         x = squeeze(X(c,tr,:));
         plot(x,'r');hold on
-        title('set the beginning of the saccade:')
+        title(['set the beginning of the saccade (cond ', num2str(c),' trial ', num2str(tr) ':'])
         [t_init,x_init] = ginput(1);
         plot(t_init,x_init,'*k');
-        title('set the end of the saccade:')
+        title(['set the end of the saccade (cond ', num2str(c),' trial ', num2str(tr) ':'])
         [t_end,x_end] = ginput(1);
         plot(t_end,x_end,'*k');
         pause(0.1);close

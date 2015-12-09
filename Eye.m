@@ -142,9 +142,11 @@ classdef Eye < handle
                 Ytc = cell(NumConditions,NumTrials);
                 Lx = zeros(NumConditions,NumTrials);
                 Ly = zeros(NumConditions,NumTrials);
+                TV = I.StimulusObject.S.TargetVelocity;
                 for condcount = 1:NumConditions
                     
                     for trialcount = 1:NumTrials
+                        TVc(condcount,trialcount) = TV(StimulusOrder == TrialsLabels(trialcount,condcount));
                         Xtc{condcount,trialcount} = Xtrig{StimulusOrder == TrialsLabels(trialcount,condcount)};
                         Lx(condcount,trialcount) = length(Xtc{condcount,trialcount});
                         Ytc{condcount,trialcount} = Ytrig{StimulusOrder == TrialsLabels(trialcount,condcount)};
@@ -239,6 +241,7 @@ classdef Eye < handle
                 fprintf(['Save to File ... '])
                 EyePreProcessed.X = Xtc;EyePreProcessed.Y = Ytc;
                 EyePreProcessed.Xtrunc = XtcTrunc;EyePreProcessed.Ytrunc = YtcTrunc;
+                EyePreProcessed.TargetVelocity = TVc;
             elseif strcmp(I.StimulusObject.S.Type,'DoubleStepRamp')
                 fprintf(['Save to File ... '])
                 
