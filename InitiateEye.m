@@ -1,6 +1,6 @@
 %% Set the Experiment Information Here
 
-TestName        =   '15120807';
+TestName        =   '16021104';
 PatientName     =   'Test';
 
 %% What do you want to do?                                                                                                                                                                                                                   

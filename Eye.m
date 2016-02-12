@@ -133,7 +133,7 @@ classdef Eye < handle
             
             % cutting to conditions is different for different types of
             % stimuli
-            if strcmp(I.StimulusObject.S.Type,'StepRamp') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit2')
+            if strcmp(I.StimulusObject.S.Type,'StepRamp') || strcmp(I.StimulusObject.S.Type,'ExtendedStepRamp') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit2')
                 StimulusOrder = I.StimulusObject.S.order;
                 NumConditions = length(I.StimulusObject.S.type);
                 NumTrials = floor(max(I.StimulusObject.S.order)./NumConditions);
@@ -142,11 +142,16 @@ classdef Eye < handle
                 Ytc = cell(NumConditions,NumTrials);
                 Lx = zeros(NumConditions,NumTrials);
                 Ly = zeros(NumConditions,NumTrials);
-                TV = I.StimulusObject.S.TargetVelocity;
+                if isfield(I.StimulusObject.S,'TargetVelocity') 
+                    TV = I.StimulusObject.S.TargetVelocity; 
+                end
+                
                 for condcount = 1:NumConditions
                     
                     for trialcount = 1:NumTrials
-                        TVc(condcount,trialcount) = TV(StimulusOrder == TrialsLabels(trialcount,condcount));
+                        if exist('TV','var') 
+                            TVc(condcount,trialcount) = TV(StimulusOrder == TrialsLabels(trialcount,condcount));
+                        end
                         Xtc{condcount,trialcount} = Xtrig{StimulusOrder == TrialsLabels(trialcount,condcount)};
                         Lx(condcount,trialcount) = length(Xtc{condcount,trialcount});
                         Ytc{condcount,trialcount} = Ytrig{StimulusOrder == TrialsLabels(trialcount,condcount)};
@@ -162,9 +167,13 @@ classdef Eye < handle
                 YtcTrunc = nan(NumConditions,NumTrials,MinL);
                 for condcount = 1:NumConditions
                     for trialcount = 1:NumTrials
-                        
-                        XtcTrunc(condcount,trialcount,:) = Xtc{condcount,trialcount}(1:MinL);
-                        YtcTrunc(condcount,trialcount,:) = Ytc{condcount,trialcount}(1:MinL);
+                        if isempty(Xtc{condcount,trialcount}) || isempty(Ytc{condcount,trialcount})
+                            XtcTrunc(condcount,trialcount,:) = nan(1,MinL);
+                            YtcTrunc(condcount,trialcount,:) = nan(1,MinL);
+                        else
+                            XtcTrunc(condcount,trialcount,:) = Xtc{condcount,trialcount}(1:MinL);
+                            YtcTrunc(condcount,trialcount,:) = Ytc{condcount,trialcount}(1:MinL);
+                        end
                         
                     end
                 end
@@ -237,11 +246,13 @@ classdef Eye < handle
             
             % Different variables will be saved to EyePreProcessed in the
             % case of different stimuli.
-            if strcmp(I.StimulusObject.S.Type,'StepRamp') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit')|| strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit2')
+            if strcmp(I.StimulusObject.S.Type,'StepRamp') || strcmp(I.StimulusObject.S.Type,'ExtendedStepRamp') || strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit')|| strcmp(I.StimulusObject.S.Type,'RandomDotsPursuit2')
                 fprintf(['Save to File ... '])
                 EyePreProcessed.X = Xtc;EyePreProcessed.Y = Ytc;
                 EyePreProcessed.Xtrunc = XtcTrunc;EyePreProcessed.Ytrunc = YtcTrunc;
-                EyePreProcessed.TargetVelocity = TVc;
+                if exist('TVc','var')
+                    EyePreProcessed.TargetVelocity = TVc;
+                end
             elseif strcmp(I.StimulusObject.S.Type,'DoubleStepRamp')
                 fprintf(['Save to File ... '])
                 
