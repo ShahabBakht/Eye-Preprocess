@@ -265,6 +265,10 @@ classdef Eye < handle
                 EyePreProcessed.Xtrunc_testLearn =  Xtrunc_testLearn;
                 EyePreProcessed.Ytrunc_testLearn =  Ytrunc_testLearn;
                 
+            elseif strcmp(I.StimulusObject.S.Type,'SPEMandVGS')
+                fprintf(['Save to File ... '])
+                EyePreProcessed.Xtrig =  Xtrig;
+                EyePreProcessed.Ytrig =  Ytrig;
             end
             
             save([SaveLocation '\EyePreProcessed_' I.TestName],'EyePreProcessed');
